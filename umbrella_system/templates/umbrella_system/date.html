@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>date</title>
+        <style>
+            td{
+                text-align:center;
+            }
+        </style>
+    </head>
+    <br>
+        <h2>date</h2>
+        <a href="../../{{last_date.year}}{%if last_date.month < 10%}0{%endif%}{{last_date.month}}/date"><<{{last_date.year}}年{{last_date.month}}月</a>
+        <a href="../../{{next_date.year}}{%if next_date.month < 10%}0{%endif%}{{next_date.month}}/date">{{next_date.year}}年{{next_date.month}}月>></a>
+        <table>
+            <tr>
+                <td colspan="7">{{cal.year}}年{{cal.month}}月</td>
+            </tr>
+            <tr>
+                <td>日</td>
+                <td>月</td>
+                <td>火</td>
+                <td>水</td>
+                <td>木</td>
+                <td>金</td>
+                <td>土</td>
+            </tr>
+        {% for days in cal.days %}
+            <tr>{% for day in days %}
+                <td>{%if day != 0%}<a href="{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{day}}">{%if day < 10%}0{%endif%}{{day}}</a>{%else%}{%endif%}</td>{% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        {{cal.dates}}
+        {% url 'umbrella_system:date' 201606 %}
+        {{x}}
+    </body>
+</html>
