@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     # ex: /umbrella_system/201606/date/
     url(r'^(?P<dates>[0-9]+)/date/$', views.date, name='date'),
+    url(r'^room/$', views.room, name='room'),
 ]

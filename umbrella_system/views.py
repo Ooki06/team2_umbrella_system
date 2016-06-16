@@ -3,6 +3,9 @@ from django.shortcuts import render
 from django.template import loader, RequestContext
 import time,datetime
 import calendar
+from .models import Room,Genre,User,Order
+
+
 
 def	index(request):
 	return render(request,'umbrella_system/index.html')
@@ -23,3 +26,8 @@ def	date(request, dates):
     contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,})
 
     return HttpResponse(render(request,'umbrella_system/date.html',contexts))
+
+def room(request):
+    contexts = dict({'messages': Room.objects.all(),})
+
+    return HttpResponse(render(request, 'umbrella_system/room.html', contexts))
