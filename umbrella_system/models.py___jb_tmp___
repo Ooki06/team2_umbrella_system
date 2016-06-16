@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db import models
+from .models import Room,Genre,User,Order
 
 
 # Create your models here.
