@@ -1,23 +1,24 @@
 from __future__ import unicode_literals
-
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
 # Create your models here.
 class Room(models.Model):
     name = models.CharField(max_length=200)
-    def __str__(self):
+    seats = models.IntegerField(default=0)
+    def __unicode__(self):
         return self.name
 
 class Genre(models.Model):
     name = models.CharField(max_length=200)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class User(models.Model):
     password = models.CharField(max_length=8)
     name = models.CharField(max_length=20)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Order(models.Model):
@@ -27,4 +28,3 @@ class Order(models.Model):
     time_zone_id = models.IntegerField(default=0)
     order_day = models.DateTimeField('date published')
     charge_lv = models.IntegerField(default=0)
-    order_flg = models.IntegerField(default=0)
