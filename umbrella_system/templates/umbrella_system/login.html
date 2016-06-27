@@ -1,0 +1,35 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/login.css' %}" />
+
+<div align="center">
+	<form action="{% url 'umbrella_system:login_go'%}" method="post">
+		{{error_messages}}
+		{% csrf_token %}
+		<table border="0">
+			<tr>
+				<th>
+					ユーザID
+				</th>
+					<td>
+						<input type="text" name="user_name" value="" size="24">
+					</td>
+			</tr>
+
+			<tr>
+				<th>
+					パスワード
+				</th>
+					<td>
+						<input type="text" name="password" value="" size="24">
+					</td>
+			</tr>
+
+			<tr>
+				<td>
+					<input type="submit" value="ログイン" size="24"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>

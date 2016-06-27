@@ -7,10 +7,12 @@
             }
         </style>
     </head>
-    <br>
+    <body>
+        <a href="{% url 'umbrella_system:logout' %}">ログアウト</a>
+        <br>
         <h2>date</h2>
-        <a href="../../{{last_date.year}}{%if last_date.month < 10%}0{%endif%}{{last_date.month}}/date"><<{{last_date.year}}年{{last_date.month}}月</a>
-        <a href="../../{{next_date.year}}{%if next_date.month < 10%}0{%endif%}{{next_date.month}}/date">{{next_date.year}}年{{next_date.month}}月>></a>
+        <a href="../../{{last_date.year}}{%if last_date.month < 10%}0{%endif%}{{last_date.month}}01/date"><<{{last_date.year}}年{{last_date.month}}月</a>
+        <a href="../../{{next_date.year}}{%if next_date.month < 10%}0{%endif%}{{next_date.month}}01/date">{{next_date.year}}年{{next_date.month}}月>></a>
         <table>
             <tr>
                 <td colspan="7">{{cal.year}}年{{cal.month}}月</td>
@@ -26,12 +28,47 @@
             </tr>
         {% for days in cal.days %}
             <tr>{% for day in days %}
-                <td>{%if day != 0%}<a href="{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{day}}">{%if day < 10%}0{%endif%}{{day}}</a>{%else%}{%endif%}</td>{% endfor %}
+                <td>{%if day != 0%}<a href="../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{day}}/date">{%if day < 10%}0{%endif%}{{day}}</a>{%else%}{%endif%}</td>{% endfor %}
             </tr>
             {% endfor %}
         </table>
-        {{cal.dates}}
-        {% url 'umbrella_system:date' 201606 %}
-        {{x}}
+        {{rooms.all}}
+        {% for room in rooms.all %}
+            <table border="1">
+                <tr>
+                    <td colspan="10">{{room}}教室</td>
+                </tr>
+                <tr>
+                    <td>時間</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                </tr>
+                <tr>
+                    <td>予約状況</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+            </br>
+        {% endfor %}
+        {{i}}
+        {{roomset}}
+        {% for room in roomset.all %}
+            {{room}}
+        {% endfor %}
     </body>
 </html>

@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <title>index</title>
+    </head>
+    <body>
+        <h2>index</h2>
+	    <form action="{% url 'umbrella_system:yoyaku_touroku'%}" method="post">
+		{% csrf_token %}
+            <input type="hidden" name="date" value="{{date}}" />
+            <input type="hidden" name="time" value="{{time}}" />
+            <input type="hidden" name="room" value="{{room}}" />
+            <p>学年</p>
+                <select name="charge_lv">
+                    <option value="1">高学年</option>
+                    <option value="2">中学年</option>
+                    <option value="0">低学年</option>
+                </select>
+            <p>科目</p>
+                <select name="genres">{% for genre in genres %}
+                    <option value="{{genre}}">{{genre}}</option>
+                    {% endfor %}
+                </select>
+            </br>
+            <input type="submit" value="登録" />
+        </form>
+    </body>
+</html>
