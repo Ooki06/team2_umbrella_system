@@ -32,15 +32,17 @@ def	date(request, dates):
     dt = datetime.datetime(year, month, day)
     rooms = Room.objects.all()
     i = 0
-    roomset={}
+    roomset=[]
     for rooma in rooms:
         orders = Order.objects.filter(room=rooma,order_day=dt)
-        wari={}
+        wari=[]
+
+        for i in range(1, 6):
+            wari.append(dict({'time':i}))
         for order in orders:
-            times = dict({'time':order.time_zone_id,'user':order.user.name})
-            wari.update({order.time_zone_id:times})
-        room = dict({'name':rooma.name,'wari':wari})
-        roomset.update({rooma.name:room})
+            wari[order.time_zone_id-1] = dict({'time':order.time_zone_id,'user':order.user.name,'genre':order.genre.name})
+        wari = sorted(wari, key=lambda wari: wari['time'])
+        roomset.append(dict({'room_name':rooma.name,'seats':rooma.seats,'wari':wari}))
         i += 1
 
     contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset,'i':i})
