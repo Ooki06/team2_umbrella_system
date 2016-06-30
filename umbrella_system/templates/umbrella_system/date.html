@@ -32,43 +32,26 @@
             </tr>
             {% endfor %}
         </table>
-        {{rooms.all}}
-        {% for room in rooms.all %}
+        {% for room in roomset %}
             <table border="1">
                 <tr>
-                    <td colspan="10">{{room}}教室</td>
+                    <td colspan="10">{{room.room_name}}教室:{{room.seats}}人</td>
                 </tr>
                 <tr>
                     <td>時間</td>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td>7</td>
-                    <td>8</td>
-                    <td>9</td>
+                    {% for wari in room.wari %}
+                        <td>{{wari.time}}</td>
+                    {% endfor %}
                 </tr>
                 <tr>
                     <td>予約状況</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    {% for wari in room.wari %}
+                        <td>{{wari.user}}</br>{{wari.genre}}</td>
+                    {% endfor %}
                 </tr>
             </table>
             </br>
         {% endfor %}
-        {{i}}
         {{roomset}}
-        {% for room in roomset.all %}
-            {{room}}
-        {% endfor %}
     </body>
 </html>

@@ -28,3 +28,5 @@ class Order(models.Model):
     time_zone_id = models.IntegerField(default=0)
     order_day = models.DateTimeField('date published')
     charge_lv = models.IntegerField(default=0)
+    def __unicode__(self):
+        return self.room.name
