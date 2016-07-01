@@ -18,6 +18,11 @@ def	date(request, dates):
     day = gdate%100
     month = (gdate%10000-day)//100
 
+    day_of_week = datetime.date(year, month, day).weekday()
+    flg_holiday = False
+    if (day_of_week == 5 or day_of_week == 6):
+        flg_holiday = True
+    
     if 'user_name' in request.session:
         session = dict({'user_name':request.session['user_name']})
     else:
@@ -45,7 +50,7 @@ def	date(request, dates):
         roomset.append(dict({'room_name':rooma.name,'seats':rooma.seats,'wari':wari}))
         i += 1
 
-    contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset})
+    contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset,'flg_holiday':flg_holiday})
     contexts.update(session)
 
     return HttpResponse(render(request,'umbrella_system/date.html',contexts))
