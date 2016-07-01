@@ -28,7 +28,7 @@ def	date(request, dates):
     next_date = dict({'year':dt.year,'month':dt.month,})
     dt = datetime.datetime.fromtimestamp(time.mktime((year, month-1, 1, 0, 0, 0, 0, 0, 0)))
     last_date = dict({'year':dt.year,'month':dt.month,})
-    cal = dict({'year':year,'month':month,'days':calendar.monthcalendar(year, month),})
+    cal = dict({'year':year,'month':month,'day':day,'days':calendar.monthcalendar(year, month),})
     dt = datetime.datetime(year, month, day)
     rooms = Room.objects.all()
     i = 0
@@ -45,7 +45,8 @@ def	date(request, dates):
         roomset.append(dict({'room_name':rooma.name,'seats':rooma.seats,'wari':wari}))
         i += 1
 
-    contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset,'i':i})
+    contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset})
+    contexts.update(session)
 
     return HttpResponse(render(request,'umbrella_system/date.html',contexts))
 
