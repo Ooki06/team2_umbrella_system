@@ -40,13 +40,17 @@
                 <tr>
                     <td>時間</td>
                     {% for wari in room.wari %}
-                        <td>{{wari.time}}</td>
+                        <td>{{wari.time}}時限目</td>
                     {% endfor %}
                 </tr>
                 <tr>
                     <td>予約状況</td>
                     {% for wari in room.wari %}
-                        <td>{{wari.user}}</br>{{wari.genre}}</td>
+                        {% if wari.user %}
+                            <td>{{wari.user}}</br>{{wari.genre}}</br>{% ifequal wari.user user_name %}<button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku'">取消</button>{% endifequal %}</td>
+                        {% else %}
+                            <td><button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku'">予約</button></td>
+                        {% endif %}
                     {% endfor %}
                 </tr>
             </table>
