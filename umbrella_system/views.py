@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.template import loader, RequestContext
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
@@ -86,7 +86,6 @@ def login_go(request):
 def logout(request):
     if 'user_name' in request.session:
         del request.session['user_name']
-
     contexts = dict({'error_messages': ''})
 
     return HttpResponseRedirect(reverse('umbrella_system:login',))
@@ -96,9 +95,19 @@ def yoyaku(request,dates,room,time):
         session = dict({'user_name':request.session['user_name']})
     else:
         return HttpResponseRedirect(reverse('umbrella_system:login'))
-    selected_genre = Genre.objects.all()
-    contexts = dict({'genres': selected_genre,'date':dates,'time':time,'room':room})
-    return HttpResponse(render(request, 'umbrella_system/yoyaku.html', contexts))
+    year = int(dates)//10000
+    day = int(dates)%100
+    month = (int(dates)%10000-day)//100
+    dt = datetime.datetime(year, month, day)
+    try:
+        if (Order.objects.filter(room=Room.objects.get(name=room), time_zone_id=time, order_day=dt).count() > 0):
+            raise Http404
+        else:
+            selected_genre = Genre.objects.all()
+            contexts = dict({'genres': selected_genre, 'date': dates, 'time': time, 'room': room})
+            return HttpResponse(render(request, 'umbrella_system/yoyaku.html', contexts))
+    except (KeyError, Room.DoesNotExist):
+        raise Http404
 
 def yoyaku_touroku(request):
     if 'user_name' in request.session:
@@ -107,13 +116,14 @@ def yoyaku_touroku(request):
     else:
             return HttpResponseRedirect(reverse('umbrella_system:login'))
     try:
+
         selected_genre = Genre.objects.get(name=request.POST['genres'])
         selected_user = User.objects.get(name=uname)
         selected_room = Room.objects.get(name=request.POST['room'])
         order = Order()
-    except (KeyError, User.DoesNotExist):
+    except (KeyError, Room.DoesNotExist,User.DoesNotExist,Genre.DoesNotExist):
         contexts = dict({'error_message': 'NO DATE'})
-        return HttpResponse(render(request, 'umbrella_system/yoyaku.html', contexts))
+        return HttpResponse(render(request, 'umbrella_system/index.html', contexts))
     else:
         year = int(request.POST['date'])//10000
         day = int(request.POST['date'])%100
@@ -126,4 +136,40 @@ def yoyaku_touroku(request):
         order.order_day = dt
         order.charge_lv = request.POST['charge_lv']
         order.save()
-        return HttpResponseRedirect(reverse('umbrella_system:date', args=('20160601',)))
+        return HttpResponseRedirect(reverse('umbrella_system:date', args=(request.POST['date'],)))
+def yoyaku_del(request,dates,room,time):
+    if 'user_name' in request.session:
+        session = dict({'user_name':request.session['user_name']})
+    else:
+        return HttpResponseRedirect(reverse('umbrella_system:login'))
+    year = int(dates)//10000
+    day = int(dates)%100
+    month = (int(dates)%10000-day)//100
+    dt = datetime.datetime(year, month, day)
+    try:
+        if (Order.objects.filter(room=Room.objects.get(name=room), time_zone_id=time, order_day=dt,user=User.objects.get(name=request.session['user_name'])).count() == 1):
+            selected_order = Order.objects.get(room=Room.objects.get(name=room), time_zone_id=time, order_day=dt,user=User.objects.get(name=request.session['user_name']))
+            contexts = dict({'room': selected_order.room.name, 'date': dates, 'time': selected_order.charge_lv, 'genre': selected_order.genre,'charge':selected_order.charge_lv})
+            return HttpResponse(render(request, 'umbrella_system/yoyakudel.html', contexts))
+        else:
+            raise Http404
+    except (KeyError, Room.DoesNotExist,User.DoesNotExist):
+        raise Http404
+def yoyaku_del_go(request):
+    if 'user_name' in request.session:
+        session = dict({'user_name':request.session['user_name']})
+        uname = request.session['user_name']
+    else:
+            return HttpResponseRedirect(reverse('umbrella_system:login'))
+    try:
+        selected_user = User.objects.get(name=uname)
+        selected_room = Room.objects.get(name=request.POST['room'])
+    except (KeyError, Room.DoesNotExist,User.DoesNotExist,Genre.DoesNotExist):
+        raise Http404
+    else:
+        year = int(request.POST['date'])//10000
+        day = int(request.POST['date'])%100
+        month = (int(request.POST['date'])%10000-day)//100
+        dt = datetime.datetime(year, month, day)
+        selected_order = Order.objects.get(room=selected_room,user=selected_user,time_zone_id=request.POST['time'], order_day=dt).delete()
+        return HttpResponseRedirect(reverse('umbrella_system:date', args=(request.POST['date'],)))

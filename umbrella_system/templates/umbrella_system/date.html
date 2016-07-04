@@ -47,7 +47,7 @@
                     <td>予約状況</td>
                     {% for wari in room.wari %}
                         {% if wari.user %}
-                            <td>{{wari.user}}</br>{{wari.genre}}</br>{% ifequal wari.user user_name %}<button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku'">取消</button>{% endifequal %}</td>
+                            <td>{{wari.user}}</br>{{wari.genre}}</br>{% ifequal wari.user user_name %}<button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku_del'">取消</button>{% endifequal %}</td>
                         {% else %}
                             <td><button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku'">予約</button></td>
                         {% endif %}
