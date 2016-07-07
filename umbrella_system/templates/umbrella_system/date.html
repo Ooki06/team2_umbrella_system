@@ -11,6 +11,8 @@
         <a href="{% url 'umbrella_system:logout' %}">ログアウト</a>
         <br>
         <h2>date</h2>
+        <a href="../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}/zikanwari">{{cal.month}}月の時間割</a>
+        </br>
         <a href="../../{{last_date.year}}{%if last_date.month < 10%}0{%endif%}{{last_date.month}}01/date"><<{{last_date.year}}年{{last_date.month}}月</a>
         <a href="../../{{next_date.year}}{%if next_date.month < 10%}0{%endif%}{{next_date.month}}01/date">{{next_date.year}}年{{next_date.month}}月>></a>
         <table>
@@ -40,7 +42,7 @@
                 <tr>
                     <td>時間</td>
                     {% for wari in room.wari %}
-                        <td>{{wari.time}}時限目</td>
+                        <td>{{wari.time_zone}}</td>
                     {% endfor %}
                 </tr>
                 <tr>

@@ -1,146 +1,28 @@
-<html>
-	<head>
-		<style>
-			.waku1{
-				margin: 10px; 
-				height: 700px;
-				width: 900px;
-				border-width: 1px;
-				border-spacing: 10px;
-			}
-			
-			td{
-				text-align: center;
-			}
-				
-			#a{
-				margin-top: -100px;
-			}
-				
-			.waku2{
-				margin: 10px; 
-				height: 700px;
-				width: 900px;
-				border-width: 1px;
-				border-spacing: 10px;
-			}
-		</style>
-	</head>
+{% load staticfiles %}
 
-	<body>
-		<table  border =1 class="waku1">
-		<p>休日</p>
-		 <tr><td></td><td colspan=5>1</td></tr>
-		 <tr><td></td><td colspan=5>日</td></tr>
-		 <tr><td>　　</td>
-		 	<td><p>10:00~11:00</p></td>
-		 	<td><p>11:15~12:15</p></td>
-		 	<td><p>13:15~14:15</p></td>
-		 	<td><p>14:30~15:30</p></td>
-		 	<td><p>15:45~16:45</p></td></tr>
-		 <tr><td>101</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>102</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>103</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>201</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>202</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>203</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>301</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>302</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>303</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		</table>
-		
-		<table  border =1 class="waku2">
-		<p>平日</p>
-		 <tr><td></td><td colspan=3>5</td></tr>
-		 <tr><td></td><td colspan=3>月</td></tr>
-		 <tr><td>　　</td>
-		 	<td>15:00~16:00</td>
-		 	<td>16:15~17:15</td>
-		 	<td>17:30~18:30</td></tr>
-		 <tr id="p4">
-		 <td>101</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>102</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>103</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>201</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>202</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>203</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>301</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>302</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		 <tr><td>303</td>
-		 	<td></td>
-		 	<td></td>
-		 	<td></td></tr>
-		</table>
-		<input type="submit" value="テーブル" onclick="location.href='table.html'">
-	</body>
-	
-</html>
+<link rel="stylesheet" type="text/css" href="{% static 'polls/yoyakudel.css' %}" />
+{{cal.year}}
+{{cal.month}}
+{% for day in days %}
+<table  border =1 class="waku1">
+ <tr><td></td><td colspan={{day.time_seet|length}}>{{day.day}}譌･</td></tr>
+ <tr><td></td><td colspan={{day.time_seet|length}}>{{day.weekday}}</td></tr>
+ <tr><td></td>
+	 {% for time in day.time_seet %}
+	 	<td>{{time}}</td>
+	 {%endfor%}
+ </tr>
+	{% for room in day.rooms %}
+ 	<tr>
+		<td>{{room.room_name}}</td>
+		{% for wari in room.wari %}
+			{% if wari.user %}
+            	<td>{{wari.user}}</br>{{wari.genre}}</br></td>
+			{% else %}
+				<td></td>
+			{% endif %}
+		{%endfor%}
+	</tr>
+	{%endfor%}
+</table>
+{%endfor%}
