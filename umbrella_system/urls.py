@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^(?P<dates>[0-9]+)/(?P<room>[0-9]+)/(?P<time>[0-9]+)/yoyaku_del/$', views.yoyaku_del, name='yoyaku_del'),
     url(r'^yoyaku_touroku/$', views.yoyaku_touroku, name='yoyaku_touroku'),
     url(r'^yoyaku_del_go/$', views.yoyaku_del_go, name='yoyaku_del_go'),
+    url(r'^(?P<dates>[0-9]+)/zikanwari/$', views.zikanwari, name='zikanwari'),
 ]
