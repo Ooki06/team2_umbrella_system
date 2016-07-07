@@ -1,25 +1,21 @@
-<html>
-	<head>
-		<style>
-			#p1{
-				text-align: center;
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				margin: auto;
-				height: 500px;
-				width: 500px;
-			}
-		</style>
-	</head>
-	<body>
-	<div id="p1">
-		<p>—\–ñ‚ğæ‚èÁ‚µ‚Ü‚·‚©?</p>
-		<span><input type="submit" value="‚Í‚¢" onclick="location.href='table.html'"></span>@@@@@@@@
-		<span><input type="submit" value="‚¢‚¢‚¦" onclick="location.href='table.html'"></span>
-	</div>
-	</body>
-	
-</html>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/yoyakudel.css' %}" />
+<p>{{room}}</p>
+<p>{{date}}</p>
+<p>{{time}}</p>
+<p>{{genre}}</p>
+<p>{{charge}}</p>
+
+
+<div id="p1">
+	<p>äºˆç´„ã‚’å–ã‚Šæ¶ˆã—ã¾ã™ã‹?</p>
+	<form action="{% url 'umbrella_system:yoyaku_del_go'%}" method="post">
+		{% csrf_token %}
+			<input type="hidden" name="date" value="{{date}}" />
+            <input type="hidden" name="time" value="{{time}}" />
+            <input type="hidden" name="room" value="{{room}}" />
+		<input type="submit" value="ã¯ã„">
+	</form>
+	<button onclick="location.href='../../../../{{date}}/date'">ã„ã„ãˆ</button>
+</div>
