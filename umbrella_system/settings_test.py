@@ -1,4 +1,4 @@
-from polls.settings import *
+from umbrella_system.settings import *
 import os
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
