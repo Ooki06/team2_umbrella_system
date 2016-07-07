@@ -9,7 +9,7 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-xml',
     '--cover-html',
-    '--cover-package=polls',
+    '--cover-package=umbrella_system',
 ]
 
 DATABASES = {
