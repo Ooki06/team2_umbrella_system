@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nose',
-    'team2_umbrella_system.umbrella_system',
+    'team2.umbrella_system',
 ]
 
 MIDDLEWARE_CLASSES = [
