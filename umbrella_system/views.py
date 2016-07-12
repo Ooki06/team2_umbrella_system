@@ -8,6 +8,11 @@ from .models import Room,Genre,User,Order
 
 
 
+def get_time_seet(flg_holiday):
+    if (flg_holiday):
+        return ['10:00~11:00', '11:15~12:15', '13:15~14:15', '14:30~15:30', '15:45~16:45']
+    else:
+        return ['15:00~16:00', '16:15~17:15', '17:30~18:30']
 
 def	index(request):
 	return render(request,'umbrella_system/index.html')
@@ -227,8 +232,6 @@ def	zikanwari(request, dates):
             wari = sorted(wari, key=lambda wari: wari['time'])
             roomset.append(dict({'room_name': rooma.name, 'seats': rooma.seats, 'wari': wari}))
         days.append(dict({'day':day_set,'time_seet':time_seet,'weekday':datetime.datetime(year, month, day_set).weekday(),'rooms':roomset,}))
-
     contexts = dict({'cal':cal,'days':days,})
     contexts.update(session)
-
     return HttpResponse(render(request,'umbrella_system/zikanwari.html',contexts))
