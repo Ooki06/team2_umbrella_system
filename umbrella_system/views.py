@@ -7,7 +7,21 @@ import calendar
 from .models import Room,Genre,User,Order
 
 
-
+def get_weekday(week):
+    if week==0 :
+        return 'Monday'
+    elif week==1:
+        return 'Tuesday'
+    elif week==2:
+        return 'Wednesday'
+    elif week==3:
+        return 'Thursday'
+    elif week==4:
+        return 'Friday'
+    elif week==5:
+        return 'Saturday'
+    else:
+        return 'Sunday'
 def get_time_seet(flg_holiday):
     if (flg_holiday):
         return ['10:00~11:00', '11:15~12:15', '13:15~14:15', '14:30~15:30', '15:45~16:45']
@@ -23,13 +37,8 @@ def	date(request, dates):
     day = gdate%100
     month = (gdate%10000-day)//100
 
-    day_of_week = datetime.date(year, month, day).weekday()
-    flg_holiday = False
-    if (day_of_week == 5 or day_of_week == 6):
-        flg_holiday = True
-    
-    if 'user_name' in request.session:
-        session = dict({'user_name':request.session['user_name']})
+    if 'login_user' in request.session:
+        session = dict({'login_user':request.session['login_user']})
     else:
             return HttpResponseRedirect(reverse('umbrella_system:login'))
 
@@ -42,12 +51,13 @@ def	date(request, dates):
     dt = datetime.datetime(year, month, day)
     rooms = Room.objects.all()
 
-    if (flg_holiday):
-        time_set = 6;
-        time_seet = ['10:00~11:00', '11:15~12:15', '13:15~14:15', '14:30~15:30', '15:45~16:45']
+    day_of_week = datetime.date(year, month, day).weekday()
+    if (day_of_week == 5 or day_of_week == 6):
+        time_set = 6
+        time_seet = get_time_seet(True)
     else:
-        time_set = 4;
-        time_seet = ['15:00~16:00', '16:15~17:15', '17:30~18:30']
+        time_set = 4
+        time_seet = get_time_seet(False)
     roomset=[]
     for rooma in rooms:
         orders = Order.objects.filter(room=rooma,order_day=dt)
@@ -56,30 +66,19 @@ def	date(request, dates):
         for i in range(1, time_set):
             wari.append(dict({'time':i,'time_zone':time_seet[i-1],}))
         for order in orders:
-            wari[order.time_zone_id-1] = dict({'time':order.time_zone_id,'time_zone':time_seet[order.time_zone_id-1],'user':order.user.name,'genre':order.genre.name})
+            wari[order.time_zone_id-1] = dict({'time':order.time_zone_id,'time_zone':time_seet[order.time_zone_id-1],'user_id':order.user.user_ids,'user_name':order.user.user_name,'genre':order.genre.name})
         wari = sorted(wari, key=lambda wari: wari['time'])
         roomset.append(dict({'room_name':rooma.name,'seats':rooma.seats,'wari':wari}))
 
-    contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset,'flg_holiday':flg_holiday})
+    contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset})
     contexts.update(session)
 
     return HttpResponse(render(request,'umbrella_system/date.html',contexts))
 
-def room(request):
-    contexts = dict({'messages': Room.objects.all(),})
-    rooms = Room.objects.all()
-    for rooma in rooms:
-        orders = rooma.order_set.exclude()
-        wari = dict({})
-        for order in orders:
-            wari.update({'time':order.time_zone_id,'user':order.user.name})
-        contexts[rooma] = wari
-    return HttpResponse(render(request, 'umbrella_system/room.html', contexts))
-
 def login(request):
     contexts = dict({'error_messages': ''})
-    if 'user_name' in request.session:
-        session = dict({'user_name':request.session['user_name']})
+    if 'login_user' in request.session:
+        session = dict({'login_user':request.session['login_user']})
         dt = datetime.date.today()
         if(dt.month//10==0):
             date = str(dt.year)+'0'+str(dt.month)+'01'
@@ -89,12 +88,12 @@ def login(request):
     return HttpResponse(render(request, 'umbrella_system/login.html', contexts))
 
 def login_go(request):
-    selected_user=User.objects.get(name=request.POST['user_name'])
+    selected_user=User.objects.get(user_ids=request.POST['login_user'])
     if selected_user.password != request.POST['password']:
         contexts = dict({'error_messages': 'NO ID OR PASSWORD'})
         return HttpResponse(render(request, 'umbrella_system/login.html', contexts))
     else:
-        request.session['user_name'] = selected_user.name
+        request.session['login_user'] = selected_user.user_ids
         dt = datetime.date.today()
         if(dt.month//10==0):
             date = str(dt.year)+'0'+str(dt.month)+'01'
@@ -104,15 +103,15 @@ def login_go(request):
 
 
 def logout(request):
-    if 'user_name' in request.session:
-        del request.session['user_name']
+    if 'login_user' in request.session:
+        del request.session['login_user']
     contexts = dict({'error_messages': ''})
 
     return HttpResponseRedirect(reverse('umbrella_system:login',))
 
 def yoyaku(request,dates,room,time):
-    if 'user_name' in request.session:
-        session = dict({'user_name':request.session['user_name']})
+    if 'login_user' in request.session:
+        session = dict({'login_user':request.session['login_user']})
     else:
         return HttpResponseRedirect(reverse('umbrella_system:login'))
     year = int(dates)//10000
@@ -130,15 +129,15 @@ def yoyaku(request,dates,room,time):
         raise Http404
 
 def yoyaku_touroku(request):
-    if 'user_name' in request.session:
-        session = dict({'user_name':request.session['user_name']})
-        uname = request.session['user_name']
+    if 'login_user' in request.session:
+        session = dict({'login_user':request.session['login_user']})
+        uname = request.session['login_user']
     else:
             return HttpResponseRedirect(reverse('umbrella_system:login'))
     try:
 
         selected_genre = Genre.objects.get(name=request.POST['genres'])
-        selected_user = User.objects.get(name=uname)
+        selected_user = User.objects.get(user_ids=uname)
         selected_room = Room.objects.get(name=request.POST['room'])
         order = Order()
     except (KeyError, Room.DoesNotExist,User.DoesNotExist,Genre.DoesNotExist):
@@ -158,8 +157,8 @@ def yoyaku_touroku(request):
         order.save()
         return HttpResponseRedirect(reverse('umbrella_system:date', args=(request.POST['date'],)))
 def yoyaku_del(request,dates,room,time):
-    if 'user_name' in request.session:
-        session = dict({'user_name':request.session['user_name']})
+    if 'login_user' in request.session:
+        session = dict({'login_user':request.session['login_user']})
     else:
         return HttpResponseRedirect(reverse('umbrella_system:login'))
     year = int(dates)//10000
@@ -167,8 +166,8 @@ def yoyaku_del(request,dates,room,time):
     month = (int(dates)%10000-day)//100
     dt = datetime.datetime(year, month, day)
     try:
-        if (Order.objects.filter(room=Room.objects.get(name=room), time_zone_id=time, order_day=dt,user=User.objects.get(name=request.session['user_name'])).count() == 1):
-            selected_order = Order.objects.get(room=Room.objects.get(name=room), time_zone_id=time, order_day=dt,user=User.objects.get(name=request.session['user_name']))
+        if (Order.objects.filter(room=Room.objects.get(name=room), time_zone_id=time, order_day=dt,user=User.objects.get(user_ids=request.session['login_user'])).count() == 1):
+            selected_order = Order.objects.get(room=Room.objects.get(name=room), time_zone_id=time, order_day=dt,user=User.objects.get(user_ids=request.session['login_user']))
             contexts = dict({'room': selected_order.room.name, 'date': dates, 'time': selected_order.time_zone_id, 'genre': selected_order.genre,'charge':selected_order.charge_lv})
             return HttpResponse(render(request, 'umbrella_system/yoyakudel.html', contexts))
         else:
@@ -176,13 +175,13 @@ def yoyaku_del(request,dates,room,time):
     except (KeyError, Room.DoesNotExist,User.DoesNotExist):
         raise Http404
 def yoyaku_del_go(request):
-    if 'user_name' in request.session:
-        session = dict({'user_name':request.session['user_name']})
-        uname = request.session['user_name']
+    if 'login_user' in request.session:
+        session = dict({'login_user':request.session['login_user']})
+        uname = request.session['login_user']
     else:
             return HttpResponseRedirect(reverse('umbrella_system:login'))
     try:
-        selected_user = User.objects.get(name=uname)
+        selected_user = User.objects.get(user_ids=uname)
         selected_room = Room.objects.get(name=request.POST['room'])
     except (KeyError, Room.DoesNotExist,User.DoesNotExist,Genre.DoesNotExist):
         raise Http404
@@ -200,8 +199,8 @@ def	zikanwari(request, dates):
     day = 1
     month = gdate%100
 
-    if 'user_name' in request.session:
-        session = dict({'user_name':request.session['user_name']})
+    if 'login_user' in request.session:
+        session = dict({'login_user':request.session['login_user']})
     else:
             return HttpResponseRedirect(reverse('umbrella_system:login'))
 
@@ -213,12 +212,13 @@ def	zikanwari(request, dates):
     rooms = Room.objects.all()
     days = []
     for day_set in range(1, datetime.datetime.fromtimestamp(time.mktime((year, month+1, -1, 0, 0, 0, 0, 0, 0))).day+1):
-        if (datetime.datetime(year, month, day_set).weekday() == 5 or datetime.datetime(year, month, day_set).weekday() == 6):
-            time_set = 6;
-            time_seet =['10:00~11:00','11:15~12:15','13:15~14:15','14:30~15:30','15:45~16:45']
+        day_of_week = datetime.date(year, month, day).weekday()
+        if (day_of_week == 5 or day_of_week == 6):
+            time_set = 6
+            time_seet =  get_time_seet(True)
         else:
-            time_set = 4;
-            time_seet =['15:00~16:00','16:15~17:15','17:30~18:30']
+            time_set = 4
+            time_seet =  get_time_seet(False)
         roomset = []
         for rooma in rooms:
             orders = Order.objects.filter(room=rooma, order_day=datetime.datetime(year, month, day_set))
@@ -228,10 +228,10 @@ def	zikanwari(request, dates):
                 wari.append(dict({'time': i}))
             for order in orders:
                 wari[order.time_zone_id - 1] = dict(
-                    {'time': order.time_zone_id, 'user': order.user.name, 'genre': order.genre.name})
+                    {'time': order.time_zone_id, 'user': order.user.user_ids, 'genre': order.genre.name})
             wari = sorted(wari, key=lambda wari: wari['time'])
             roomset.append(dict({'room_name': rooma.name, 'seats': rooma.seats, 'wari': wari}))
-        days.append(dict({'day':day_set,'time_seet':time_seet,'weekday':datetime.datetime(year, month, day_set).weekday(),'rooms':roomset,}))
+        days.append(dict({'day':day_set,'time_seet':time_seet,'weekday':get_weekday(datetime.datetime(year, month, day_set).weekday()),'rooms':roomset,}))
     contexts = dict({'cal':cal,'days':days,})
     contexts.update(session)
     return HttpResponse(render(request,'umbrella_system/zikanwari.html',contexts))

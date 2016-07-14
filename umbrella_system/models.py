@@ -16,10 +16,11 @@ class Genre(models.Model):
         return self.name
 
 class User(models.Model):
+    user_ids = models.CharField(max_length=20)
+    user_name = models.CharField(max_length=20,default='')
     password = models.CharField(max_length=8)
-    name = models.CharField(max_length=20)
     def __unicode__(self):
-        return self.name
+        return self.user_name
 
 class Order(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
