@@ -73,7 +73,7 @@
                 </fieldset>
             </div>
             <div id="rooms">
-                {{cal.day}}日
+                {{cal.day}}日{%if holiday_name%}:{{holiday_name}}{%endif%}
                 <fieldset>
                     <legend>教室一覧</legend>
                     {% for room in roomset %}
