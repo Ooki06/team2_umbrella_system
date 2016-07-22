@@ -1,28 +1,71 @@
-{% load staticfiles %}
-
-<link rel="stylesheet" type="text/css" href="{% static 'polls/yoyakudel.css' %}" />
-{{cal.year}}
-{{cal.month}}
-{% for day in days %}
-<table  border =1 class="waku1">
- <tr><td></td><td colspan={{day.time_seet|length}}>{{day.day}}日</td></tr>
- <tr><td></td><td colspan={{day.time_seet|length}}>{{day.weekday}}</td></tr>
- <tr><td></td>
-	 {% for time in day.time_seet %}
-	 	<td>{{time}}</td>
-	 {%endfor%}
- </tr>
-	{% for room in day.rooms %}
- 	<tr>
-		<td>{{room.room_name}}</td>
-		{% for wari in room.wari %}
-			{% if wari.user %}
-            	<td>{{wari.user}}</br>{{wari.genre}}</br></td>
-			{% else %}
-				<td></td>
-			{% endif %}
-		{%endfor%}
-	</tr>
-	{%endfor%}
-</table>
-{%endfor%}
+<html>
+    <head>
+        <title>date</title>
+		<style>
+            div table{
+                float:left;
+            }
+            div{
+                float:right;
+            }
+            .dan{
+                float:left;
+            }
+            body{overflow:visible;
+            }
+            .holiday{
+            	color:red;
+            }
+            #zikanwari{
+                margin-right: auto;
+                margin-left: auto;
+            }
+            #zikanwari *{
+                white-space: nowrap;
+            }
+		</style>
+    </head>
+        <header>
+            <a href="{% url 'umbrella_system:logout' %}">ログアウト</a>
+        </header>
+			{% load staticfiles %}
+			{{cal.year}}
+			{{cal.month}}
+			</br>
+			<table id="zikanwari">
+				{%for day_set in days%}
+					<tr>
+					{%for day in day_set%}
+						<td>
+							{% ifnotequal day 0 %}
+								<table {% ifequal day.weekday 'Sunday' %}class="holiday"{%endifequal%}{% ifequal day.weekday 'Saturday' %}class="holiday"{%endifequal%} border =1>
+									<tr><td></td><td colspan={{day.time_seet|length}}>{{day.day}}日</td></tr>
+									<tr><td></td><td colspan={{day.time_seet|length}}>{{day.weekday}}</td></tr>
+									<tr><td></td>
+										{% for time in day.time_seet %}
+										<td>{{time}}</td>
+										{%endfor%}
+									</tr>
+				{% for room in day.rooms %}
+									<tr>
+									<td>{{room.room_name}}</td>
+										{% for wari in room.wari %}
+											{% if wari.user %}
+												<td>{{wari.user}}</br>{{wari.genre}}</br></td>
+											{% else %}
+												<td></td>
+											{% endif %}
+										{%endfor%}
+									</tr>
+									{%endfor%}
+								</table>
+							{%endifnotequal%}
+						</td>
+					{%endfor%}
+					</tr>
+				{%endfor%}
+			</table>
+        </main>
+        <footer></footer>
+    </body>
+</html>
