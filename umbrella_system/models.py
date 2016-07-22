@@ -31,3 +31,9 @@ class Order(models.Model):
     charge_lv = models.IntegerField(default=0)
     def __unicode__(self):
         return self.room.name
+
+class Holiday(models.Model):
+    name = models.CharField(max_length=20)
+    holiday_date = models.DateTimeField('date published')
+    def __unicode__(self):
+        return self.name

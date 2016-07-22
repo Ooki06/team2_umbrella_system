@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 import time,datetime
 import calendar
-from .models import Room,Genre,User,Order
+from .models import Room,Genre,User,Order,Holiday
 
 
 def get_weekday(week):
@@ -52,7 +52,13 @@ def	date(request, dates):
     rooms = Room.objects.all()
 
     day_of_week = datetime.date(year, month, day).weekday()
-    if (day_of_week == 5 or day_of_week == 6):
+    try:
+        selected_holiday = Holiday.objects.get(holiday_date=dt)
+    except (KeyError, Holiday.DoesNotExist,):
+        holiday = ''
+    else:
+        holiday = dict({'holiday_name': selected_holiday.name})
+    if (day_of_week == 5 or day_of_week == 6 or 'holiday_name' in holiday):
         time_set = 6
         time_seet = get_time_seet(True)
     else:
@@ -72,6 +78,8 @@ def	date(request, dates):
 
     contexts = dict({'cal':cal,'next_date':next_date,'last_date':last_date,'rooms':Room.objects.all(),'roomset':roomset})
     contexts.update(session)
+    contexts.update(holiday)
+
 
     return HttpResponse(render(request,'umbrella_system/date.html',contexts))
 
@@ -221,7 +229,13 @@ def	zikanwari(request, dates):
         for day in days[i]:
             if day > 0:
                 day_of_week = datetime.datetime(year, month, day).weekday()
-                if (day_of_week == 5 or day_of_week == 6):
+                try:
+                    selected_holiday = Holiday.objects.get(holiday_date=datetime.datetime(year, month, day))
+                except (KeyError, Holiday.DoesNotExist,):
+                    holiday = ''
+                else:
+                    holiday = dict({'holiday_name': selected_holiday.name})
+                if (day_of_week == 5 or day_of_week == 6 or 'holiday_name' in holiday):
                     time_set = 6
                     time_seet =  get_time_seet(True)
                 else:
