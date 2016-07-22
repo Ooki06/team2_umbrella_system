@@ -88,18 +88,23 @@ def login(request):
     return HttpResponse(render(request, 'umbrella_system/login.html', contexts))
 
 def login_go(request):
-    selected_user=User.objects.get(user_ids=request.POST['login_user'])
-    if selected_user.password != request.POST['password']:
-        contexts = dict({'error_messages': 'NO ID OR PASSWORD'})
-        return HttpResponse(render(request, 'umbrella_system/login.html', contexts))
+    try:
+        selected_user=User.objects.get(user_ids=request.POST['login_user'])
+    except (KeyError,User.DoesNotExist,):
+            contexts = dict({'error_messages': 'NO ID OR PASSWORD'})
+            return HttpResponse(render(request, 'umbrella_system/login.html', contexts))
     else:
-        request.session['login_user'] = selected_user.user_ids
-        dt = datetime.date.today()
-        if(dt.month//10==0):
-            date = str(dt.year)+'0'+str(dt.month)+'01'
+        if selected_user.password != request.POST['password']:
+            contexts = dict({'error_messages': 'NO ID OR PASSWORD'})
+            return HttpResponse(render(request, 'umbrella_system/login.html', contexts))
         else:
-            date = str(dt.year)+''+str(dt.month)+'01'
-        return HttpResponseRedirect(reverse('umbrella_system:date', args=(date,)))
+            request.session['login_user'] = selected_user.user_ids
+            dt = datetime.date.today()
+            if(dt.month//10==0):
+                date = str(dt.year)+'0'+str(dt.month)+'01'
+            else:
+                date = str(dt.year)+''+str(dt.month)+'01'
+            return HttpResponseRedirect(reverse('umbrella_system:date', args=(date,)))
 
 
 def logout(request):
@@ -196,7 +201,6 @@ def yoyaku_del_go(request):
 def	zikanwari(request, dates):
     gdate = int(dates)
     year = gdate//100
-    day = 1
     month = gdate%100
 
     if 'login_user' in request.session:
@@ -208,30 +212,37 @@ def	zikanwari(request, dates):
     cal = dict({'year':year,'month':month,})
 
 
-    dt = datetime.datetime(year, month, day)
+    dt = datetime.datetime(year, month, 1)
     rooms = Room.objects.all()
-    days = []
-    for day_set in range(1, datetime.datetime.fromtimestamp(time.mktime((year, month+1, -1, 0, 0, 0, 0, 0, 0))).day+1):
-        day_of_week = datetime.date(year, month, day).weekday()
-        if (day_of_week == 5 or day_of_week == 6):
-            time_set = 6
-            time_seet =  get_time_seet(True)
-        else:
-            time_set = 4
-            time_seet =  get_time_seet(False)
-        roomset = []
-        for rooma in rooms:
-            orders = Order.objects.filter(room=rooma, order_day=datetime.datetime(year, month, day_set))
-            wari = []
+    calendar.setfirstweekday(calendar.SUNDAY)
+    days = calendar.monthcalendar(year, month)
+    for i in range(0, len(days)):
+        weeks = []
+        for day in days[i]:
+            if day > 0:
+                day_of_week = datetime.datetime(year, month, day).weekday()
+                if (day_of_week == 5 or day_of_week == 6):
+                    time_set = 6
+                    time_seet =  get_time_seet(True)
+                else:
+                    time_set = 4
+                    time_seet =  get_time_seet(False)
+                roomset = []
+                for rooma in rooms:
+                    orders = Order.objects.filter(room=rooma, order_day=datetime.datetime(year, month, day))
+                    wari = []
 
-            for i in range(1, time_set):
-                wari.append(dict({'time': i}))
-            for order in orders:
-                wari[order.time_zone_id - 1] = dict(
-                    {'time': order.time_zone_id, 'user': order.user.user_ids, 'genre': order.genre.name})
-            wari = sorted(wari, key=lambda wari: wari['time'])
-            roomset.append(dict({'room_name': rooma.name, 'seats': rooma.seats, 'wari': wari}))
-        days.append(dict({'day':day_set,'time_seet':time_seet,'weekday':get_weekday(datetime.datetime(year, month, day_set).weekday()),'rooms':roomset,}))
+                    for j in range(1, time_set):
+                        wari.append(dict({'time': j}))
+                    for order in orders:
+                        wari[order.time_zone_id - 1] = dict(
+                            {'time': order.time_zone_id, 'user': order.user.user_ids, 'genre': order.genre.name})
+                    wari = sorted(wari, key=lambda wari: wari['time'])
+                    roomset.append(dict({'room_name': rooma.name, 'seats': rooma.seats, 'wari': wari}))
+                weeks.append(dict({'day':day,'time_seet':time_seet,'weekday':get_weekday(datetime.datetime(year, month, day).weekday()),'rooms':roomset,}))
+            else:
+                weeks.append(0)
+        days[i] = weeks
     contexts = dict({'cal':cal,'days':days,})
     contexts.update(session)
     return HttpResponse(render(request,'umbrella_system/zikanwari.html',contexts))

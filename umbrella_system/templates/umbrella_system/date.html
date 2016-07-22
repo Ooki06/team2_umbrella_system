@@ -5,61 +5,102 @@
             td{
                 text-align:center;
             }
+            header{
+                clear:both;
+            }
+            #calender{
+                float:left;
+            }
+            #rooms{
+                float:left;
+            }
+            .cal_day a:visited{
+                color:blue;
+            }
+            .cal_day:nth-child(1) a:link{
+                color:red;
+            }
+            .cal_day:nth-child(7n) a:link{
+                color:red;
+            }
+            .cal_day:nth-child(7n+1) a:link{
+                color:red;
+            }
+            .cal_day:nth-child(1) a:visited{
+                color:red;
+            }
+            .cal_day:nth-child(7n) a:visited{
+                color:red;
+            }
+            .cal_day:nth-child(7n+1) a:visited{
+                color:red;
+            }
         </style>
     </head>
     <body>
         <header>
-            <a href="{% url 'umbrella_system:logout' %}">ログアウト</a></header>
+            <a href="{% url 'umbrella_system:logout' %}">ログアウト</a>
+        </header>
         <main>
             <a href="../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}/zikanwari">{{cal.month}}月の時間割</a>
+            <br>
             <div id="calender">
-                <a href="../../{{last_date.year}}{%if last_date.month < 10%}0{%endif%}{{last_date.month}}01/date"><<{{last_date.year}}年{{last_date.month}}月</a>
-                <a href="../../{{next_date.year}}{%if next_date.month < 10%}0{%endif%}{{next_date.month}}01/date">{{next_date.year}}年{{next_date.month}}月>></a>
-                <table>
-                    <tr>
-                        <td colspan="7">{{cal.year}}年{{cal.month}}月</td>
-                    </tr>
-                    <tr>
-                        <td>日</td>
-                        <td>月</td>
-                        <td>火</td>
-                        <td>水</td>
-                        <td>木</td>
-                        <td>金</td>
-                        <td>土</td>
-                    </tr>
-                {% for days in cal.days %}
-                    <tr>{% for day in days %}
-                        <td>{%if day != 0%}<a href="../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{day}}/date">{%if day < 10%}0{%endif%}{{day}}</a>{%else%}{%endif%}</td>{% endfor %}
-                    </tr>
-                    {% endfor %}
-                </table>
+                <fieldset>
+                    <legend>カレンダー</legend>
+                    <center>
+                        <a href="../../{{last_date.year}}{%if last_date.month < 10%}0{%endif%}{{last_date.month}}01/date"><<{{last_date.year}}年{{last_date.month}}月</a>
+                        <a href="../../{{next_date.year}}{%if next_date.month < 10%}0{%endif%}{{next_date.month}}01/date">{{next_date.year}}年{{next_date.month}}月>></a>
+                        <table>
+                            <tr>
+                                <td colspan="7">{{cal.year}}年{{cal.month}}月</td>
+                            </tr>
+                            <tr>
+                                <td>日</td>
+                                <td>月</td>
+                                <td>火</td>
+                                <td>水</td>
+                                <td>木</td>
+                                <td>金</td>
+                                <td>土</td>
+                            </tr>
+                        {% for days in cal.days %}
+                            <tr>{% for day in days %}
+                                <td class="cal_day">{%if day != 0%}<a href="../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{day}}/date">{%if day < 10%}0{%endif%}{{day}}</a>{%else%}{%endif%}</td>{% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </center>
+                </fieldset>
             </div>
             <div id="rooms">
-                {% for room in roomset %}
-                    <table border="1">
-                        <tr>
-                            <td colspan="10">{{room.room_name}}教室:{{room.seats}}人</td>
-                        </tr>
-                        <tr>
-                            <td>時間</td>
-                            {% for wari in room.wari %}
-                                <td>{{wari.time_zone}}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td>予約状況</td>
-                            {% for wari in room.wari %}
-                                {% if wari.user_id %}
-                                    <td>{{wari.user_name}}</br>{{wari.genre}}</br>{% ifequal wari.user_id login_user %}<button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku_del'">取消</button>{% endifequal %}</td>
-                                {% else %}
-                                    <td><button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku'">予約</button></td>
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                    </table>
-                    </br>
-                {% endfor %}
+                {{cal.day}}日
+                <fieldset>
+                    <legend>教室一覧</legend>
+                    {% for room in roomset %}
+                        <table border="1">
+                            <tr>
+                                <td colspan="10">{{room.room_name}}教室:{{room.seats}}人</td>
+                            </tr>
+                            <tr>
+                                <td>時間</td>
+                                {% for wari in room.wari %}
+                                    <td>{{wari.time_zone}}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td>予約状況</td>
+                                {% for wari in room.wari %}
+                                    {% if wari.user_id %}
+                                        <td>{{wari.user_name}}</br>{{wari.genre}}</br>{% ifequal wari.user_id login_user %}<button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if cal.day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku_del'">取消</button>{% endifequal %}</td>
+                                    {% else %}
+                                        <td><button onClick="location.href='../../{{cal.year}}{%if cal.month < 10%}0{%endif%}{{cal.month}}{%if cal.day < 10%}0{%endif%}{{cal.day}}/{{room.room_name}}/{{wari.time}}/yoyaku'">予約</button></td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </table>
+                        </br>
+                    {% endfor %}
+                </fieldset>
             </div>
         </main>
         <footer></footer>
